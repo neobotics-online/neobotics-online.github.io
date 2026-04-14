@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Acceso Secreto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: black;
+      color: #00ffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .box {
+      border: 1px solid #00ffcc;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 0 20px #00ffcc;
+    }
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 80%;
+      background: black;
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+    }
+    button {
+      padding: 10px 20px;
+      background: #00ffcc;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #hidden {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>🔐 SISTEMA RESTRINGIDO</h2>
+  <p>Ingrese contraseña</p>
+  <input type="password" id="password">
+  <br>
+  <button onclick="checkPassword()">Acceder</button>
+
+  <div id="hidden">
+    <p>Ingrese código de desencriptación</p>
+    <input type="text" id="code">
+    <br>
+    <button onclick="decrypt()">Desencriptar</button>
+    <div id="imageContainer"></div>
+  </div>
+</div>
+
+<script>
+  // nt
+  const PASSWORD = "admin123"; 
+  const PASSWORD2 = "123456"; 
+  const ACCESS_KEY = "root"; 
+
+  // nt
+  const REAL_HASH = "0b9e6e4a6c3c8d9b3f7c4a6b5c2a0e1d3f9b7a8c6d5e4f3a2b1c0d9e8f7a6b5";
+
+  const SECRET_CODE = "cicada";
+  const encryptedImage = "aHR0cHM6Ly9pLmltZ3VyLmNvbS9wc3FqaDJpLnBuZw==";
+
+  async function sha256(text) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function checkPassword() {
+    let input = document.getElementById("password").value;
+    let hashed = await sha256(input);
+
+    if (hashed === REAL_HASH) {
+      document.getElementById("hidden").style.display = "block";
+    } else {
+      alert("❌ Contraseña incorrecta");
+    }
+  }
+
+  function decrypt() {
+    let code = document.getElementById("code").value;
+    if (code === SECRET_CODE) {
+      let decoded = atob(encryptedImage);
+      document.getElementById("imageContainer").innerHTML =
+        "<img src='" + decoded + "'>";
+    } else {
+      alert("❌ Código incorrecto");
+    }
+  }
+</script>
+
+</body>
+</html>
